@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ضبط صدا و یاداشت نویسی</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            direction: rtl;
+        }
+        .box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px auto;
+            width: 300px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        .box h2 {
+            margin-bottom: 10px;
+        }
+        .box button {
+            margin: 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .box input[type="text"], .box textarea {
+            padding: 5px;
+            font-size: 14px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .box audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .recording-info {
+            display: none;
+            margin-top: 10px;
+        }
+        .notes {
+            margin-top: 10px;
+        }
+        .edit-title {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+        .toggle-notes {
+            margin-top: 10px;
+            text-align: left;
+        }
+        .toggle-notes label {
+            cursor: pointer;
+        }
+        .saved-notes {
+            display: none;
+            margin-top: 10px;
+            text-align: left;
+            max-height: 100px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>برنامه ضبط صدا و یاداشت نویسی</h1>
+
+    <!-- تعریف ده باکس -->
+    <div id="boxesContainer"></div>
+
+    <script>
+        // تابع برای ایجاد PDF
+        function createPDF(audioBlob, notes, fileName) {
+            const { jsPDF } = window.jspdf;
+
+            // ایجاد شی PDF
+            const pdf = new jsPDF();
+
+            // اضافه کردن متن یاداشت به PDF
+            pdf.text("یاداشت:", 10, 10);
+            pdf.text(notes, 10, 20);
+
+            // تبدیل فایل صوتی به Base64 و ذخیره در PDF
+            const reader = new FileReader();
+            reader.onload = () => {
+                const audioBase64 = reader.result.split(',')[1];
+                const now = new Date().toISOString().replace(/[:.]/g, '-');
+                const audioFileName = `${fileName}_${now}.wav`;
+
+                // اضافه کردن لینک دانلود فایل صوتی به PDF
+                pdf.text(`فایل صوتی: ${audioFileName}`, 10, 30);
+
+                // ذخیره PDF
+                const pdfBlob = pdf.output('blob');
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(pdfBlob);
+                a.download = `${fileName}_recordings.pdf`;
+                a.click();
+
+                // ذخیره فایل صوتی
+                const audioLink = document.createElement('a');
+                audioLink.href = URL.createObjectURL(audioBlob);
+                audioLink.download = audioFileName;
+                audioLink.click();
+            };
+            reader.readAsDataURL(audioBlob);
+        }
+
+        // تابع برای ایجاد یک باکس جدید
+        function createBox(title) {
+            const box = document.createElement('div');
+            box.classList.add('box');
+
+            const heading = document.createElement('h2');
+            heading.textContent = title;
+            heading.contentEditable = false;
+
+            const editTitleButton = document.createElement('button');
+            editTitleButton.textContent = 'ویرایش';
+            editTitleButton.classList.add('edit-title');
+            editTitleButton.onclick = () => {
+                heading.contentEditable = !heading.contentEditable;
+                if (heading.contentEditable) {
+                    heading.focus();
+                } else {
+                    heading.blur();
+                }
+            };
+
+            const startButton = document.createElement('button');
+            startButton.textContent = 'شروع ضبط';
+            startButton.id = 'startButton';
+
+            const stopButton = document.createElement('button');
+            stopButton.textContent = 'متوقف کردن';
+            stopButton.disabled = true;
+            stopButton.id = 'stopButton';
+
+            const fileNameInput = document.createElement('input');
+            fileNameInput.type = 'text';
+            fileNameInput.placeholder = 'نام فایل را وارد کنید';
+            fileNameInput.id = 'fileName';
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'ذخیره به PDF';
+            saveButton.disabled = true;
+            saveButton.id = 'saveButton';
+
+            const notesLabel = document.createElement('label');
+            notesLabel.textContent = 'یاداشت:';
+
+            const notesTextarea = document.createElement('textarea');
+            notesTextarea.rows = 4;
+            notesTextarea.placeholder = 'یاداشت خود را اینجا بنویسید...';
+
+            const recordingInfo = document.createElement('div');
+            recordingInfo.classList.add('recording-info');
+
+            const toggleNotesDiv = document.createElement('div');
+            toggleNotesDiv.classList.add('toggle-notes');
+
+            const toggleNotesLabel = document.createElement('label');
+            toggleNotesLabel.textContent = 'نمایش/مخفی کردن یادداشت‌ها:';
+            toggleNotesLabel.htmlFor = 'toggle-notes-checkbox';
+
+            const toggleNotesCheckbox = document.createElement('input');
+            toggleNotesCheckbox.type = 'checkbox';
+            toggleNotesCheckbox.id = 'toggle-notes-checkbox';
+
+            const savedNotesDiv = document.createElement('div');
+            savedNotesDiv.classList.add('saved-notes');
+
+            toggleNotesCheckbox.onchange = () => {
+                savedNotesDiv.style.display = toggleNotesCheckbox.checked ? 'block' : 'none';
+            };
+
+            toggleNotesDiv.appendChild(toggleNotesLabel);
+            toggleNotesDiv.appendChild(toggleNotesCheckbox);
+
+            box.appendChild(heading);
+            box.appendChild(editTitleButton);
+            box.appendChild(startButton);
+            box.appendChild(stopButton);
+            box.appendChild(fileNameInput);
+            box.appendChild(saveButton);
+            box.appendChild(notesLabel);
+            box.appendChild(notesTextarea);
+            box.appendChild(recordingInfo);
+            box.appendChild(toggleNotesDiv);
+            box.appendChild(savedNotesDiv);
+
+            let mediaRecorder;
+            let audioChunks = [];
+            const savedNotesList = [];
+
+            startButton.onclick = async () => {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+
+                    const audioElement = document.createElement('audio');
+                    audioElement.controls = true;
+                    audioElement.src = URL.createObjectURL(audioBlob);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'حذف';
+                    deleteButton.onclick = () => {
+                        URL.revokeObjectURL(audioElement.src);
+                        recordingInfo.innerHTML = '';
+                    };
+
+                    const downloadButton = document.createElement('button');
+                    downloadButton.textContent = 'دانلود';
+                    downloadButton.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = audioElement.src;
+                        a.download = `${fileNameInput.value || 'ثبت_صدا'}.wav`;
+                        a.click();
+                    };
+
+                    const noteDisplay = document.createElement('p');
+                    noteDisplay.textContent = `یاداشت: ${notesTextarea.value || 'بدون یاداشت'}`;
+
+                    recordingInfo.innerHTML = '';
+                    recordingInfo.appendChild(audioElement);
+                    recordingInfo.appendChild(deleteButton);
+                    recordingInfo.appendChild(downloadButton);
+                    recordingInfo.appendChild(noteDisplay);
+                    recordingInfo.style.display = 'block';
+
+                    // ذخیره یادداشت در لیست
+                    const noteItem = document.createElement('p');
+                    noteItem.textContent = `عنوان: ${heading.textContent}, یاداشت: ${notesTextarea.value || 'بدون یاداشت'}`;
+                    savedNotesList.push(noteItem);
+                    savedNotesDiv.innerHTML = ''; // پاک کردن محتوای قبلی
+                    savedNotesList.forEach(note => savedNotesDiv.appendChild(note));
+
+                    saveButton.disabled = false; // فعال کردن دکمه ذخیره PDF
+                };
+
+                mediaRecorder.start();
+                startButton.disabled = true;
+                stopButton.disabled = false;
+            };
+
+            stopButton.onclick = () => {
+                if (mediaRecorder) mediaRecorder.stop();
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            };
+
+            saveButton.onclick = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const notes = notesTextarea.value;
+                const fileName = fileNameInput.value || 'ثبت_صدا';
+                createPDF(audioBlob, notes, fileName);
+            };
+
+            return box;
+        }
+
+        // ایجاد ده باکس با عنوان متفاوت
+        const titles = [
+            'شیمی آلی', 'زیست‌شناسی', 'فیزیک', 'ریاضیات', 'آمار',
+            'حسابان', 'جبر', 'علوم اجتماعی', 'تاریخ', 'فلسفه'
+        ];
+
+        const boxesContainer = document.getElementById('boxesContainer');
+        titles.forEach(title => {
+            const box = createBox(title);
+            boxesContainer.appendChild(box);
+        });
+
+        // بارگذاری jspdf
+        const script = document.createElement('script');
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
