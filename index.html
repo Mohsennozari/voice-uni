@@ -6,22 +6,42 @@
     <title>ضبط صدا و یاداشت نویسی</title>
     <style>
         @import url('https://vfont.ir/css/Vazirmatn.css'); /* فونت وزیر متن */
-
+        *{
+        font-family: 'Vazirmatn', Arial, sans-serif;
+        
+        font-size: 20px;
+        font-weight: 900;
+        border-radius:10px;
+        
+        }
         body {
             font-family: 'Vazirmatn', Arial, sans-serif; /* استفاده از فونت وزیر متن */
             text-align: center;
             margin: 20px;
-            direction: rtl;
+        font-family: 'Vazirmatn', Arial, sans-serif; /* استفاده از فونت وزیر متن */
+        text-align: center;
+        margin: 20px;
+        color: #000000;
+        background-color: #000000;
+      }
+        
+        body {
+            font-family: 'Vazirmatn', Arial, sans-serif; /* استفاده از فونت وزیر متن */
+            text-align: center;
+            margin: 20px;
+            color: #000000;
             background-color: #000000;
         }
         .box {
             border: 1px solid #000000;
             padding: 20px;
-            margin: 10px auto;
+            margin: 30px auto;
             width: 300px;
             border-radius: 5px;
-            background-color: #2b2b2b;
+            background-color: #000000;
             position: relative;
+            box-shadow:#ff9900 0 0 10px;
+            font-family: 'Vazirmatn', Arial, sans-serif;
         }
         .box h2 {
             margin-bottom: 10px;
@@ -32,6 +52,7 @@
             font-size: 14px;
             cursor: pointer;
             font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه‌ها */
+            font-family: 'Vazirmatn', Arial, sans-serif;
         }
         .box input[type="text"], .box textarea {
             padding: 5px;
@@ -39,29 +60,38 @@
             width: 100%;
             margin-bottom: 10px;
             font-family: 'Vazirmatn', Arial, sans-serif; /* فونت ورودی‌ها */
+            font-family: 'Vazirmatn', Arial, sans-serif;
+            background-color: #000000;
+            box-shadow: #ff9900 0 0 10px;
+            border: #000000 1px solid #000000; 
+            
         }
         .box audio {
             width: 100%;
             margin-top: 10px;
+            font-family: 'Vazirmatn', Arial, sans-serif;
         }
         .recording-info {
             display: none;
             margin-top: 10px;
+            font-family: 'Vazirmatn', Arial, sans-serif;
         }
         .notes {
             margin-top: 10px;
+            font-family: 'Vazirmatn', Arial, sans-serif;
         }
         .edit-title {
             position: absolute;
             top: 5px;
             right: 5px;
             font-size: 12px;
-            background: #007bff;
+            background: #000000;
+            box-shadow: #ff9900 0 0 4px;
             color: white;
             border: none;
             cursor: pointer;
             padding: 3px 8px;
-            border-radius: 3px;
+            border-radius: 5px;
             font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه ویرایش */
         }
         .saved-notes {
@@ -69,14 +99,15 @@
             text-align: left;
             max-height: 100px;
             overflow-y: auto;
-            border: 1px solid #ccc;
+            border: 1px solid #000000;
             padding: 10px;
-            background: #f0f0f0;
+            background: #2a5f63;
+            font-family: 'Vazirmatn', Arial, sans-serif;
         }
         .note-item {
             margin-bottom: 5px;
             padding: 5px;
-            background: #e0e0e0;
+            background: #fa8b8b;
             border-radius: 3px;
             cursor: pointer;
             position: relative;
