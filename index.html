@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ضبط صدا و یاداشت نویسی</title>
     <style>
+        @import url('https://vfont.ir/css/Vazirmatn.css'); /* فونت وزیر متن */
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Vazirmatn', Arial, sans-serif; /* استفاده از فونت وزیر متن */
             text-align: center;
             margin: 20px;
             direction: rtl;
@@ -28,12 +30,14 @@
             padding: 5px 10px;
             font-size: 14px;
             cursor: pointer;
+            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه‌ها */
         }
         .box input[type="text"], .box textarea {
             padding: 5px;
             font-size: 14px;
             width: 100%;
             margin-bottom: 10px;
+            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت ورودی‌ها */
         }
         .box audio {
             width: 100%;
@@ -57,16 +61,9 @@
             cursor: pointer;
             padding: 3px 8px;
             border-radius: 3px;
-        }
-        .toggle-notes {
-            margin-top: 10px;
-            text-align: left;
-        }
-        .toggle-notes label {
-            cursor: pointer;
+            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه ویرایش */
         }
         .saved-notes {
-            display: none;
             margin-top: 10px;
             text-align: left;
             max-height: 100px;
@@ -74,6 +71,38 @@
             border: 1px solid #ccc;
             padding: 10px;
             background: #f0f0f0;
+        }
+        .note-item {
+            margin-bottom: 5px;
+            padding: 5px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت یادداشت‌ها */
+        }
+        .note-item:hover {
+            background: #d0d0d0;
+        }
+        .note-title {
+            font-weight: bold;
+        }
+        .note-content {
+            display: none;
+            margin-top: 5px;
+        }
+        .save-pdf-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه PDF */
         }
     </style>
 </head>
@@ -85,40 +114,27 @@
 
     <script>
         // تابع برای ایجاد PDF
-        function createPDF(audioBlob, notes, fileName) {
+        function createPDF(noteTitle, noteContent, boxTitle) {
             const { jsPDF } = window.jspdf;
 
             // ایجاد شی PDF
             const pdf = new jsPDF();
 
             // اضافه کردن متن یاداشت به PDF
-            pdf.text("یاداشت:", 10, 10);
-            pdf.text(notes, 10, 20);
+            pdf.text("عنوان باکس:", 10, 10);
+            pdf.text(boxTitle, 10, 20);
+            pdf.text("عنوان یادداشت:", 10, 30);
+            pdf.text(noteTitle, 10, 40);
+            pdf.text("متن یادداشت:", 10, 50);
+            pdf.text(noteContent, 10, 60);
 
-            // تبدیل فایل صوتی به Base64 و ذخیره در PDF
-            const reader = new FileReader();
-            reader.onload = () => {
-                const audioBase64 = reader.result.split(',')[1];
-                const now = new Date().toISOString().replace(/[:.]/g, '-');
-                const audioFileName = `${fileName}_${now}.wav`;
-
-                // اضافه کردن لینک دانلود فایل صوتی به PDF
-                pdf.text(`فایل صوتی: ${audioFileName}`, 10, 30);
-
-                // ذخیره PDF
-                const pdfBlob = pdf.output('blob');
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(pdfBlob);
-                a.download = `${fileName}_recordings.pdf`;
-                a.click();
-
-                // ذخیره فایل صوتی
-                const audioLink = document.createElement('a');
-                audioLink.href = URL.createObjectURL(audioBlob);
-                audioLink.download = audioFileName;
-                audioLink.click();
-            };
-            reader.readAsDataURL(audioBlob);
+            // ذخیره PDF
+            const pdfBlob = pdf.output('blob');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(pdfBlob);
+            const now = new Date().toISOString().replace(/[:.]/g, '-');
+            a.download = `${boxTitle}_${now}_note.pdf`;
+            a.click();
         }
 
         // تابع برای ایجاد یک باکس جدید
@@ -134,32 +150,29 @@
             editTitleButton.textContent = 'ویرایش';
             editTitleButton.classList.add('edit-title');
             editTitleButton.onclick = () => {
-                heading.contentEditable = !heading.contentEditable;
-                if (heading.contentEditable) {
-                    heading.focus();
+                if (!heading.contentEditable) {
+                    heading.contentEditable = true;
+                    heading.focus(); // فوکوس روی عنوان
                 } else {
-                    heading.blur();
+                    heading.contentEditable = false;
+                    heading.blur(); // حذف فوکوس از عنوان
                 }
             };
 
             const startButton = document.createElement('button');
             startButton.textContent = 'شروع ضبط';
-            startButton.id = 'startButton';
 
             const stopButton = document.createElement('button');
             stopButton.textContent = 'متوقف کردن';
             stopButton.disabled = true;
-            stopButton.id = 'stopButton';
 
             const fileNameInput = document.createElement('input');
             fileNameInput.type = 'text';
             fileNameInput.placeholder = 'نام فایل را وارد کنید';
-            fileNameInput.id = 'fileName';
 
             const saveButton = document.createElement('button');
             saveButton.textContent = 'ذخیره به PDF';
             saveButton.disabled = true;
-            saveButton.id = 'saveButton';
 
             const notesLabel = document.createElement('label');
             notesLabel.textContent = 'یاداشت:';
@@ -168,29 +181,51 @@
             notesTextarea.rows = 4;
             notesTextarea.placeholder = 'یاداشت خود را اینجا بنویسید...';
 
+            const addNoteButton = document.createElement('button');
+            addNoteButton.textContent = 'افزودن یادداشت';
+            addNoteButton.onclick = () => {
+                const noteTitle = prompt('عنوان یادداشت را وارد کنید:');
+                const noteContent = notesTextarea.value.trim();
+                if (noteTitle && noteContent) {
+                    const noteItem = document.createElement('div');
+                    noteItem.classList.add('note-item');
+
+                    const noteTitleElement = document.createElement('span');
+                    noteTitleElement.classList.add('note-title');
+                    noteTitleElement.textContent = noteTitle;
+
+                    const savePdfButton = document.createElement('button');
+                    savePdfButton.classList.add('save-pdf-button');
+                    savePdfButton.textContent = 'PDF';
+                    savePdfButton.onclick = () => {
+                        createPDF(noteTitle, noteContent, heading.textContent);
+                    };
+
+                    const noteContentElement = document.createElement('div');
+                    noteContentElement.classList.add('note-content');
+                    noteContentElement.textContent = noteContent;
+
+                    noteItem.appendChild(noteTitleElement);
+                    noteItem.appendChild(savePdfButton);
+                    noteItem.appendChild(noteContentElement);
+
+                    noteItem.onclick = () => {
+                        noteContentElement.style.display =
+                            noteContentElement.style.display === 'block' ? 'none' : 'block';
+                    };
+
+                    savedNotesDiv.appendChild(noteItem);
+                    notesTextarea.value = ''; // پاک کردن متن یادداشت بعد از افزودن
+                } else {
+                    alert('لطفاً عنوان و متن یادداشت خود را وارد کنید.');
+                }
+            };
+
             const recordingInfo = document.createElement('div');
             recordingInfo.classList.add('recording-info');
 
-            const toggleNotesDiv = document.createElement('div');
-            toggleNotesDiv.classList.add('toggle-notes');
-
-            const toggleNotesLabel = document.createElement('label');
-            toggleNotesLabel.textContent = 'نمایش/مخفی کردن یادداشت‌ها:';
-            toggleNotesLabel.htmlFor = 'toggle-notes-checkbox';
-
-            const toggleNotesCheckbox = document.createElement('input');
-            toggleNotesCheckbox.type = 'checkbox';
-            toggleNotesCheckbox.id = 'toggle-notes-checkbox';
-
             const savedNotesDiv = document.createElement('div');
             savedNotesDiv.classList.add('saved-notes');
-
-            toggleNotesCheckbox.onchange = () => {
-                savedNotesDiv.style.display = toggleNotesCheckbox.checked ? 'block' : 'none';
-            };
-
-            toggleNotesDiv.appendChild(toggleNotesLabel);
-            toggleNotesDiv.appendChild(toggleNotesCheckbox);
 
             box.appendChild(heading);
             box.appendChild(editTitleButton);
@@ -200,13 +235,12 @@
             box.appendChild(saveButton);
             box.appendChild(notesLabel);
             box.appendChild(notesTextarea);
+            box.appendChild(addNoteButton);
             box.appendChild(recordingInfo);
-            box.appendChild(toggleNotesDiv);
             box.appendChild(savedNotesDiv);
 
             let mediaRecorder;
             let audioChunks = [];
-            const savedNotesList = [];
 
             startButton.onclick = async () => {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -234,9 +268,10 @@
                     const downloadButton = document.createElement('button');
                     downloadButton.textContent = 'دانلود';
                     downloadButton.onclick = () => {
+                        const now = new Date().toISOString().replace(/[:.]/g, '-');
                         const a = document.createElement('a');
                         a.href = audioElement.src;
-                        a.download = `${fileNameInput.value || 'ثبت_صدا'}.wav`;
+                        a.download = `${heading.textContent}_${now}.wav`;
                         a.click();
                     };
 
@@ -249,13 +284,6 @@
                     recordingInfo.appendChild(downloadButton);
                     recordingInfo.appendChild(noteDisplay);
                     recordingInfo.style.display = 'block';
-
-                    // ذخیره یادداشت در لیست
-                    const noteItem = document.createElement('p');
-                    noteItem.textContent = `عنوان: ${heading.textContent}, یاداشت: ${notesTextarea.value || 'بدون یاداشت'}`;
-                    savedNotesList.push(noteItem);
-                    savedNotesDiv.innerHTML = ''; // پاک کردن محتوای قبلی
-                    savedNotesList.forEach(note => savedNotesDiv.appendChild(note));
 
                     saveButton.disabled = false; // فعال کردن دکمه ذخیره PDF
                 };
@@ -275,7 +303,7 @@
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 const notes = notesTextarea.value;
                 const fileName = fileNameInput.value || 'ثبت_صدا';
-                createPDF(audioBlob, notes, fileName);
+                createPDF(fileName, notes, heading.textContent);
             };
 
             return box;
