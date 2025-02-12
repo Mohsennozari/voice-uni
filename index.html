@@ -1,362 +1,390 @@
+
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ضبط صدا و یاداشت نویسی</title>
+    <title>نرم‌افزار ضبط صدا پیشرفته</title>
+    <link href="https://cdn.jsdelivr.net/npm/@vidstack/player@latest/styles/base.css" rel="stylesheet">
     <style>
-        @import url('https://vfont.ir/css/Vazirmatn.css'); /* فونت وزیر متن */
-        *{
-        font-family: 'Vazirmatn', Arial, sans-serif;
-        
-        font-size: 20px;
-        font-weight: 900;
-        border-radius:10px;
-        
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --background-color: #f8f9fa;
         }
+
         body {
-            font-family: 'Vazirmatn', Arial, sans-serif; /* استفاده از فونت وزیر متن */
-            text-align: center;
-            margin: 20px;
-        font-family: 'Vazirmatn', Arial, sans-serif; /* استفاده از فونت وزیر متن */
-        text-align: center;
-        margin: 20px;
-        color: #000000;
-        background-color: #000000;
-      }
-        
-        body {
-            font-family: 'Vazirmatn', Arial, sans-serif; /* استفاده از فونت وزیر متن */
-            text-align: center;
-            margin: 20px;
-            color: #000000;
-            background-color: #000000;
-        }
-        .box {
-            border: 1px solid #000000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
             padding: 20px;
-            margin: 30px auto;
-            width: 300px;
-            border-radius: 5px;
-            background-color: #000000;
-            position: relative;
-            box-shadow:#ff9900 0 0 10px;
-            font-family: 'Vazirmatn', Arial, sans-serif;
+            background-color: var(--background-color);
         }
-        .box h2 {
-            margin-bottom: 10px;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .box button {
-            margin: 5px;
-            padding: 5px 10px;
-            font-size: 14px;
-            cursor: pointer;
-            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه‌ها */
-            font-family: 'Vazirmatn', Arial, sans-serif;
-        }
-        .box input[type="text"], .box textarea {
-            padding: 5px;
-            font-size: 14px;
-            width: 100%;
-            margin-bottom: 10px;
-            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت ورودی‌ها */
-            font-family: 'Vazirmatn', Arial, sans-serif;
-            background-color: #000000;
-            box-shadow: #ff9900 0 0 10px;
-            border: #000000 1px solid #000000; 
-            
-        }
-        .box audio {
-            width: 100%;
-            margin-top: 10px;
-            font-family: 'Vazirmatn', Arial, sans-serif;
-        }
-        .recording-info {
-            display: none;
-            margin-top: 10px;
-            font-family: 'Vazirmatn', Arial, sans-serif;
-        }
-        .notes {
-            margin-top: 10px;
-            font-family: 'Vazirmatn', Arial, sans-serif;
-        }
-        .edit-title {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 12px;
-            background: #000000;
-            box-shadow: #ff9900 0 0 4px;
+
+        header {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
             color: white;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            padding: 15px 30px;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
-            padding: 3px 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .record-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .stop-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .play-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #ddd;
             border-radius: 5px;
-            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه ویرایش */
+            margin: 1rem 0;
         }
-        .saved-notes {
-            margin-top: 10px;
-            text-align: left;
-            max-height: 100px;
-            overflow-y: auto;
-            border: 1px solid #000000;
-            padding: 10px;
-            background: #2a5f63;
-            font-family: 'Vazirmatn', Arial, sans-serif;
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            transition: width 0.3s ease;
         }
-        .note-item {
-            margin-bottom: 5px;
-            padding: 5px;
-            background: #fa8b8b;
-            border-radius: 3px;
-            cursor: pointer;
-            position: relative;
-            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت یادداشت‌ها */
-        }
-        .note-item:hover {
-            background: #d0d0d0;
-        }
-        .note-title {
+
+        .timer {
+            font-size: 1.5rem;
             font-weight: bold;
+            text-align: center;
+            margin: 1rem 0;
+            color: #2c3e50;
         }
-        .note-content {
-            display: none;
-            margin-top: 5px;
+
+        .boxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
-        .save-pdf-button {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 12px;
-            background: #28a745;
-            color: white;
+
+        .box {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .box-title {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #34495e;
+            cursor: pointer;
+        }
+
+        .color-picker {
+            width: 30px;
+            height: 30px;
             border: none;
             cursor: pointer;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-family: 'Vazirmatn', Arial, sans-serif; /* فونت دکمه PDF */
+            padding: 0;
+        }
+
+        .file-list {
+            margin-top: 1rem;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .sort-options {
+            margin: 1rem 0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .boxes {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>برنامه ضبط صدا و یاداشت نویسی</h1>
+    <div class="container">
+        <header>
+            <h1>📻 نرم‌افزار ضبط صدا پیشرفته</h1>
+            <p>ضبط و مدیریت فایل‌های صوتی دروس</p>
+        </header>
 
-    <!-- تعریف ده باکس -->
-    <div id="boxesContainer"></div>
+        <div class="controls">
+            <button class="record-btn" id="start-recording">⏺ شروع ضبط</button>
+            <button class="stop-btn" id="stop-recording" disabled>⏹ توقف ضبط</button>
+            <div class="timer" id="timer">00:00:00</div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <div class="sort-options">
+            <button onclick="sortFiles('date')">مرتب‌سازی بر اساس تاریخ</button>
+            <button onclick="sortFiles('name')">مرتب‌سازی بر اساس نام</button>
+        </div>
+
+        <button class="record-btn" onclick="addNewLesson()" style="margin: 1rem 0">➕ افزودن درس جدید</button>
+
+        <div class="boxes" id="boxes-container"></div>
+
+        <!-- Modals -->
+        <div class="modal" id="edit-modal">
+            <div class="modal-content">
+                <h3>ویرایش نام درس</h3>
+                <input type="text" id="lesson-name" class="form-input">
+                <div class="modal-actions">
+                    <button onclick="saveLessonName()">💾 ذخیره</button>
+                    <button onclick="closeModal()">❌ لغو</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="help-modal">
+            <div class="modal-content">
+                <h3>راهنمای استفاده</h3>
+                <p>1. برای شروع ضبط روی دکمه قرمز کلیک کنید</p>
+                <p>2. برای توقف از دکمه توقف استفاده کنید</p>
+                <p>3. با کلیک روی نام درس می‌توانید آن را ویرایش کنید</p>
+                <button onclick="closeModal()">بستن</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // تابع برای ایجاد PDF
-        function createPDF(noteTitle, noteContent, boxTitle) {
-            const { jsPDF } = window.jspdf;
+        let mediaRecorder;
+        let audioChunks = [];
+        let currentLesson = null;
+        let lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+        let timerInterval;
+        let startTime;
 
-            // ایجاد شی PDF
-            const pdf = new jsPDF();
-
-            // اضافه کردن متن یاداشت به PDF
-            pdf.text("عنوان باکس:", 10, 10);
-            pdf.text(boxTitle, 10, 20);
-            pdf.text("عنوان یادداشت:", 10, 30);
-            pdf.text(noteTitle, 10, 40);
-            pdf.text("متن یادداشت:", 10, 50);
-            pdf.text(noteContent, 10, 60);
-
-            // ذخیره PDF
-            const pdfBlob = pdf.output('blob');
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(pdfBlob);
-            const now = new Date().toISOString().replace(/[:.]/g, '-');
-            a.download = `${boxTitle}_${now}_note.pdf`;
-            a.click();
+        // Initialize if empty
+        if (lessons.length === 0) {
+            lessons = Array.from({length: 10}, (_, i) => ({
+                id: Date.now() + i,
+                name: `درس ${i + 1}`,
+                color: '#ffffff',
+                files: [],
+                created: Date.now()
+            }));
+            localStorage.setItem('lessons', JSON.stringify(lessons));
         }
 
-        // تابع برای ایجاد یک باکس جدید
-        function createBox(title) {
-            const box = document.createElement('div');
-            box.classList.add('box');
+        // Render lessons
+        function renderLessons() {
+            const container = document.getElementById('boxes-container');
+            container.innerHTML = lessons.map(lesson => `
+                <div class="box" data-id="${lesson.id}" style="background:${lesson.color}">
+                    <div class="box-header">
+                        <h3 class="box-title" ondblclick="openEditModal(${lesson.id})">${lesson.name}</h3>
+                        <div class="box-controls">
+                            <input type="color" class="color-picker" 
+                                   value="${lesson.color}" 
+                                   onchange="updateLessonColor(${lesson.id}, this.value)">
+                            <button class="delete-btn" onclick="deleteLesson(${lesson.id})">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="file-list">
+                        ${lesson.files.map((file, index) => `
+                            <div class="file-item">
+                                <span ondblclick="editFileName(${lesson.id}, ${index})">${file.name}</span>
+                                <div>
+                                    <span style="font-size:0.8rem">${file.date}</span>
+                                    <button onclick="playRecording('${file.url}')">▶️</button>
+                                    <button onclick="deleteFile(${lesson.id}, ${index})">🗑️</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="record-btn" onclick="startRecording(${lesson.id})" style="margin-top:1rem">
+                        ضبط جدید
+                    </button>
+                    <input type="file" accept="audio/*" 
+                           style="margin-top:0.5rem" 
+                           onchange="uploadFile(${lesson.id}, this)">
+                </div>
+            `).join('');
+        }
 
-            const heading = document.createElement('h2');
-            heading.textContent = title;
-            heading.contentEditable = false;
-
-            const editTitleButton = document.createElement('button');
-            editTitleButton.textContent = 'ویرایش';
-            editTitleButton.classList.add('edit-title');
-            editTitleButton.onclick = () => {
-                if (!heading.contentEditable) {
-                    heading.contentEditable = true;
-                    heading.focus(); // فوکوس روی عنوان
-                } else {
-                    heading.contentEditable = false;
-                    heading.blur(); // حذف فوکوس از عنوان
-                }
-            };
-
-            const startButton = document.createElement('button');
-            startButton.textContent = 'شروع ضبط';
-
-            const stopButton = document.createElement('button');
-            stopButton.textContent = 'متوقف کردن';
-            stopButton.disabled = true;
-
-            const fileNameInput = document.createElement('input');
-            fileNameInput.type = 'text';
-            fileNameInput.placeholder = 'نام فایل را وارد کنید';
-
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'ذخیره به PDF';
-            saveButton.disabled = true;
-
-            const notesLabel = document.createElement('label');
-            notesLabel.textContent = 'یاداشت:';
-
-            const notesTextarea = document.createElement('textarea');
-            notesTextarea.rows = 4;
-            notesTextarea.placeholder = 'یاداشت خود را اینجا بنویسید...';
-
-            const addNoteButton = document.createElement('button');
-            addNoteButton.textContent = 'افزودن یادداشت';
-            addNoteButton.onclick = () => {
-                const noteTitle = prompt('عنوان یادداشت را وارد کنید:');
-                const noteContent = notesTextarea.value.trim();
-                if (noteTitle && noteContent) {
-                    const noteItem = document.createElement('div');
-                    noteItem.classList.add('note-item');
-
-                    const noteTitleElement = document.createElement('span');
-                    noteTitleElement.classList.add('note-title');
-                    noteTitleElement.textContent = noteTitle;
-
-                    const savePdfButton = document.createElement('button');
-                    savePdfButton.classList.add('save-pdf-button');
-                    savePdfButton.textContent = 'PDF';
-                    savePdfButton.onclick = () => {
-                        createPDF(noteTitle, noteContent, heading.textContent);
-                    };
-
-                    const noteContentElement = document.createElement('div');
-                    noteContentElement.classList.add('note-content');
-                    noteContentElement.textContent = noteContent;
-
-                    noteItem.appendChild(noteTitleElement);
-                    noteItem.appendChild(savePdfButton);
-                    noteItem.appendChild(noteContentElement);
-
-                    noteItem.onclick = () => {
-                        noteContentElement.style.display =
-                            noteContentElement.style.display === 'block' ? 'none' : 'block';
-                    };
-
-                    savedNotesDiv.appendChild(noteItem);
-                    notesTextarea.value = ''; // پاک کردن متن یادداشت بعد از افزودن
-                } else {
-                    alert('لطفاً عنوان و متن یادداشت خود را وارد کنید.');
-                }
-            };
-
-            const recordingInfo = document.createElement('div');
-            recordingInfo.classList.add('recording-info');
-
-            const savedNotesDiv = document.createElement('div');
-            savedNotesDiv.classList.add('saved-notes');
-
-            box.appendChild(heading);
-            box.appendChild(editTitleButton);
-            box.appendChild(startButton);
-            box.appendChild(stopButton);
-            box.appendChild(fileNameInput);
-            box.appendChild(saveButton);
-            box.appendChild(notesLabel);
-            box.appendChild(notesTextarea);
-            box.appendChild(addNoteButton);
-            box.appendChild(recordingInfo);
-            box.appendChild(savedNotesDiv);
-
-            let mediaRecorder;
-            let audioChunks = [];
-
-            startButton.onclick = async () => {
+        // Recording functions
+        async function startRecording(lessonId) {
+            try {
+                currentLesson = lessonId;
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-
+                
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                
                 mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-
-                    const audioElement = document.createElement('audio');
-                    audioElement.controls = true;
-                    audioElement.src = URL.createObjectURL(audioBlob);
-
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'حذف';
-                    deleteButton.onclick = () => {
-                        URL.revokeObjectURL(audioElement.src);
-                        recordingInfo.innerHTML = '';
-                    };
-
-                    const downloadButton = document.createElement('button');
-                    downloadButton.textContent = 'دانلود';
-                    downloadButton.onclick = () => {
-                        const now = new Date().toISOString().replace(/[:.]/g, '-');
-                        const a = document.createElement('a');
-                        a.href = audioElement.src;
-                        a.download = `${heading.textContent}_${now}.wav`;
-                        a.click();
-                    };
-
-                    const noteDisplay = document.createElement('p');
-                    noteDisplay.textContent = `یاداشت: ${notesTextarea.value || 'بدون یاداشت'}`;
-
-                    recordingInfo.innerHTML = '';
-                    recordingInfo.appendChild(audioElement);
-                    recordingInfo.appendChild(deleteButton);
-                    recordingInfo.appendChild(downloadButton);
-                    recordingInfo.appendChild(noteDisplay);
-                    recordingInfo.style.display = 'block';
-
-                    saveButton.disabled = false; // فعال کردن دکمه ذخیره PDF
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const duration = Math.floor((Date.now() - startTime) / 1000);
+                    
+                    const lesson = lessons.find(l => l.id === currentLesson);
+                    lesson.files.push({
+                        name: `ضبط ${lesson.files.length + 1}`,
+                        url: audioUrl,
+                        date: new Date().toLocaleString(),
+                        duration: duration
+                    });
+                    
+                    localStorage.setItem('lessons', JSON.stringify(lessons));
+                    renderLessons();
+                    
+                    audioChunks = [];
+                    stream.getTracks().forEach(track => track.stop());
                 };
 
                 mediaRecorder.start();
-                startButton.disabled = true;
-                stopButton.disabled = false;
-            };
-
-            stopButton.onclick = () => {
-                if (mediaRecorder) mediaRecorder.stop();
-                startButton.disabled = false;
-                stopButton.disabled = true;
-            };
-
-            saveButton.onclick = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                const notes = notesTextarea.value;
-                const fileName = fileNameInput.value || 'ثبت_صدا';
-                createPDF(fileName, notes, heading.textContent);
-            };
-
-            return box;
+                startTimer();
+                updateControls(true);
+            } catch (err) {
+                alert('دسترسی به میکروفن مجاز نیست!');
+            }
         }
 
-        // ایجاد ده باکس با عنوان متفاوت
-        const titles = [
-            'شیمی آلی', 'زیست‌شناسی', 'فیزیک', 'ریاضیات', 'آمار',
-            'حسابان', 'جبر', 'علوم اجتماعی', 'تاریخ', 'فلسفه'
-        ];
+        // File management
+        function editFileName(lessonId, fileIndex) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            const newName = prompt('نام جدید فایل را وارد کنید:', lesson.files[fileIndex].name);
+            if (newName) {
+                lesson.files[fileIndex].name = newName;
+                localStorage.setItem('lessons', JSON.stringify(lessons));
+                renderLessons();
+            }
+        }
 
-        const boxesContainer = document.getElementById('boxesContainer');
-        titles.forEach(title => {
-            const box = createBox(title);
-            boxesContainer.appendChild(box);
+        function sortFiles(mode) {
+            lessons.forEach(lesson => {
+                lesson.files.sort((a, b) => {
+                    if (mode === 'date') return new Date(b.date) - new Date(a.date);
+                    if (mode === 'name') return a.name.localeCompare(b.name);
+                    return 0;
+                });
+            });
+            localStorage.setItem('lessons', JSON.stringify(lessons));
+            renderLessons();
+        }
+
+        // Lesson management
+        function addNewLesson() {
+            const newLesson = {
+                id: Date.now(),
+                name: `درس جدید ${lessons.length + 1}`,
+                color: '#ffffff',
+                files: [],
+                created: Date.now()
+            };
+            lessons.push(newLesson);
+            localStorage.setItem('lessons', JSON.stringify(lessons));
+            renderLessons();
+        }
+
+        function updateLessonColor(lessonId, color) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            lesson.color = color;
+            localStorage.setItem('lessons', JSON.stringify(lessons));
+            renderLessons();
+        }
+
+        // Additional features
+        function uploadFile(lessonId, input) {
+            const file = input.files[0];
+            if (file) {
+                const lesson = lessons.find(l => l.id === lessonId);
+                lesson.files.push({
+                    name: file.name,
+                    url: URL.createObjectURL(file),
+                    date: new Date().toLocaleString(),
+                    duration: 0
+                });
+                localStorage.setItem('lessons', JSON.stringify(lessons));
+                renderLessons();
+            }
+        }
+
+        function showHelp() {
+            document.getElementById('help-modal').style.display = 'flex';
+        }
+
+        // Initialization
+        document.getElementById('stop-recording').addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                updateControls(false);
+                stopTimer();
+            }
         });
 
-        // بارگذاری jspdf
-        const script = document.createElement('script');
-        script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-        document.body.appendChild(script);
+        renderLessons();
     </script>
 </body>
 </html>
